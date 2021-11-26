@@ -1,0 +1,42 @@
+import boto3
+elb=boto3.client('elb')
+print(elb)
+lbl=elb.create_load_balancer(
+        LoadBalancerName='bcsachin-lb21',
+        Listeners=[
+            {
+                'Protocol':'HTTP',
+                'LoadBalancerPort':80,
+                'InstanceProtocol':'HTTP',
+                'InstancePort':80
+                },
+            ],
+        AvailabilityZones=['us-east-2a',]
+        )
+print(lbl)
+elb.apply_security_groups_to_load_balancer(
+    LoadBalancerName='bcsachin-lb21',
+    SecurityGroups=['sg-0fe0ffa80efd8b159'],
+)
+health_check=elb.configure_health_check(
+    LoadBalancerName='bcsachin-lb21',
+    HealthCheck={
+        'Target':'TCP:22',
+        'Interval':10,
+        'Timeout':5,
+        'UnhealthyThreshold':5,
+        'HealthyThreshold':5,
+    } 
+)            
+atach=elb.register_instances_with_load_balancer(
+    LoadBalancerName='bcsachin-lb21',
+    Instances=[
+        {
+            'InstanceId': 'i-0600b5889ba3288c1', 
+        },
+        {
+            'InstanceId': 'i-06d118ddc40f2f137',
+        }
+    ]
+)
+print(atach)
